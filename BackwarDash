@@ -1,0 +1,60 @@
+using UnityEngine;
+using System.Collections;
+
+public class BackwardDash : MonoBehaviour
+{
+    public float backwardDashSpeed = 10.0f;
+    public bool canBackwardDash = true;
+    public float backwardRotationSmoothness = 10.0f;
+    public float backwardGraceTime = 0.1f;
+    public float backwardDashTime = 0.5f;
+    public float backwardDashCooldown = 2.0f;
+
+    private CharacterController controller;
+    private bool isDashing;
+    private float initialYRotation;
+    private float targetYRotation;
+    private float lastBackwardDashTime;
+
+    // Add other necessary variables and methods here
+
+    private void Awake()
+    {
+        controller = GetComponent<CharacterController>();
+        isDashing = false;
+        // Initialize other variables
+    }
+
+    private void Update()
+    {
+        // Backward dash code here
+    }
+
+    
+    private IEnumerator PerformBackwardDash()
+    {
+        isDashing = true;
+        lastBackwardDashTime = Time.time;
+
+        // Capture initial position and rotation
+        Vector3 startPosition = transform.position;
+        float startTime = Time.time;
+
+        Vector3 dashDirection = -playerCamera.forward;
+
+        initialYRotation = transform.rotation.eulerAngles.y;
+        targetYRotation = Quaternion.LookRotation(dashDirection).eulerAngles.y;
+
+        while (Time.time - startTime < backwardDashTime)
+        {
+            float currentYRotation = Mathf.LerpAngle(initialYRotation, targetYRotation, (Time.time - startTime) / backwardDashTime);
+            transform.rotation = Quaternion.Euler(0, currentYRotation, 0);
+            controller.Move(dashDirection * backwardDashSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        isDashing = false;
+    }
+
+    
+}
